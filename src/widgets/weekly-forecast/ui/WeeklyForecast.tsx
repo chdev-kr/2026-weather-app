@@ -32,6 +32,11 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
 
   // 오전/오후 중 더 대표적인 날씨 선택
   const getRepresentativeWeather = (wfAm: string, wfPm: string) => {
+    // undefined 체크
+    if (!wfAm && !wfPm) return '정보 없음';
+    if (!wfPm) return wfAm || '정보 없음';
+    if (!wfAm) return wfPm || '정보 없음';
+
     // 비나 눈이 있으면 우선
     if (wfPm.includes("비") || wfPm.includes("눈")) return wfPm;
     if (wfAm.includes("비") || wfAm.includes("눈")) return wfAm;
@@ -41,12 +46,16 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
 
   // 오전/오후 중 높은 강수확률 선택
   const getMaxRainProbability = (rnStAm: string, rnStPm: string) => {
-    return Math.max(parseInt(rnStAm), parseInt(rnStPm)).toString();
+    const am = parseInt(rnStAm) || 0;
+    const pm = parseInt(rnStPm) || 0;
+    return Math.max(am, pm).toString();
   };
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3">주간 예보</h2>
+      <h2 className="text-base sm:text-lg font-semibold mb-3">
+        주간 예보 <span className="text-sm text-muted-foreground font-normal">(3일 이후)</span>
+      </h2>
       <Card className="bg-muted/50">
         <CardContent className="p-0">
           <div className="divide-y divide-border">
