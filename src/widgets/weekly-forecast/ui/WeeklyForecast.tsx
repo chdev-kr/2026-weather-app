@@ -33,9 +33,9 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
   // 오전/오후 중 더 대표적인 날씨 선택
   const getRepresentativeWeather = (wfAm: string, wfPm: string) => {
     // undefined 체크
-    if (!wfAm && !wfPm) return '정보 없음';
-    if (!wfPm) return wfAm || '정보 없음';
-    if (!wfAm) return wfPm || '정보 없음';
+    if (!wfAm && !wfPm) return "정보 없음";
+    if (!wfPm) return wfAm || "정보 없음";
+    if (!wfAm) return wfPm || "정보 없음";
 
     // 비나 눈이 있으면 우선
     if (wfPm.includes("비") || wfPm.includes("눈")) return wfPm;
@@ -53,9 +53,7 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3">
-        주간 예보 <span className="text-sm text-muted-foreground font-normal">(3일 이후)</span>
-      </h2>
+      <h2 className="text-base sm:text-lg font-semibold mb-3">주간 예보</h2>
       <Card className="bg-muted/50">
         <CardContent className="p-0">
           <div className="divide-y divide-border">
@@ -70,7 +68,9 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
                 >
                   {/* 날짜 */}
                   <div className="w-16 sm:w-20">
-                    <p className="text-sm sm:text-base font-medium">{day.date}</p>
+                    <p className="text-sm sm:text-base font-medium">
+                      {day.date}
+                    </p>
                   </div>
 
                   {/* 날씨 아이콘 */}
@@ -92,11 +92,11 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
                   {/* 최저/최고 기온 */}
                   <div className="flex items-center gap-2 w-24 sm:w-32 justify-end">
                     <span className="text-sm sm:text-base text-blue-600 font-medium">
-                      {day.taMin}°
+                      {Math.round(parseFloat(day.taMin) || 0)}°
                     </span>
                     <span className="text-muted-foreground">/</span>
                     <span className="text-sm sm:text-base text-red-600 font-medium">
-                      {day.taMax}°
+                      {Math.round(parseFloat(day.taMax) || 0)}°
                     </span>
                   </div>
                 </div>
