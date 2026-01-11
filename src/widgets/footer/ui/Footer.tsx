@@ -16,7 +16,7 @@ export const Footer = ({ lastUpdate = "2026-01-09 14:30" }: FooterProps) => {
 
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
-            <span>마지막 업데이트: {lastUpdate}</span>
+            <span>최근 업데이트: {lastUpdate}</span>
           </div>
         </div>
       </div>
