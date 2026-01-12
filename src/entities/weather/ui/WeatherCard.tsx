@@ -15,6 +15,7 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 
 interface WeatherCardProps {
   id?: number; // 위치 ID (선택)
@@ -40,6 +41,7 @@ export const WeatherCard = ({
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedLocation, setEditedLocation] = useState(location);
+  const { removeFavorite, favorites } = useFavoritesStore();
 
   const handleLocationSave = () => {
     setIsEditing(false);
@@ -54,6 +56,22 @@ export const WeatherCard = ({
     // 편집 모드가 아닐 때만 네비게이션
     if (!isEditing && id) {
       navigate(`/weather/${id}`);
+    }
+  };
+
+  // 즐겨찾기 삭제
+  const handleRemoveFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    // id로 즐겨찾기 찾기
+    const favorite = favorites.find(
+      (fav) => parseInt(fav.id) === id
+    );
+
+    if (favorite) {
+      if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
+        removeFavorite(favorite.id);
+      }
     }
   };
 
@@ -82,11 +100,23 @@ export const WeatherCard = ({
 
   return (
     <Card
-      className={`bg-muted/50 transition-colors min-w-70 ${
+      className={`bg-muted/50 transition-colors min-w-70 relative ${
         !isEditing ? "cursor-pointer hover:bg-muted/70" : ""
       }`}
       onClick={handleCardClick}
     >
+      {/* 즐겨찾기 삭제 버튼 (오른쪽 상단) */}
+      {id && (
+        <Button
+          variant="ghost"
+          size="icon"
+          className="absolute top-2 right-2 h-6 w-6 z-10 hover:bg-destructive/10"
+          onClick={handleRemoveFavorite}
+        >
+          <X className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
+        </Button>
+      )}
+
       <CardContent className="py-3 px-8">
         <div className="flex items-center justify-between gap-3">
           <div className="flex flex-col gap-2 flex-1 min-w-0">
