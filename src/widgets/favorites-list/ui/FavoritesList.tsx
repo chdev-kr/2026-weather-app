@@ -27,7 +27,7 @@ export const FavoritesList = ({ favorites }: FavoritesListProps) => {
     <div>
       {/* 헤더 */}
       <div className="flex items-center gap-2 mb-3">
-        <h2 className="text-base sm:text-lg font-semibold">
+        <h2 className="text-base sm:text-lg font-semibold px-1">
           즐겨찾기 ({favorites.length}/6)
         </h2>
         <Button

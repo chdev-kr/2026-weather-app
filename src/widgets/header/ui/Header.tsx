@@ -59,14 +59,17 @@ export const Header = ({ showBackButton = false }: HeaderProps) => {
             </Button>
           )}
           {!showBackButton && (
-            <>
+            <button
+              onClick={() => navigate("/")}
+              className="flex items-center gap-2 cursor-pointer"
+            >
               <img
                 src="/img/logo.png"
                 alt="동그라미 세 개가 모여 구름을 형상화한 모양"
                 className="h-4 sm:h-6"
               />
               <div className="px-2 font-bold">웨더온</div>
-            </>
+            </button>
           )}
         </div>
 

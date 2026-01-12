@@ -26,7 +26,9 @@ export const HourlyForecast = ({ hourlyData }: HourlyForecastProps) => {
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3">시간별 예보</h2>
+      <h2 className="text-base sm:text-lg font-semibold mb-3 px-1">
+        시간별 예보
+      </h2>
       <div className="overflow-x-auto scrollbar-hide snap-x -mx-3 sm:-mx-4 lg:-mx-6 px-3 sm:px-4 lg:px-6">
         <div className="flex gap-3 min-w-max">
           {hourlyData.map((hour, index) => (
@@ -34,7 +36,9 @@ export const HourlyForecast = ({ hourlyData }: HourlyForecastProps) => {
               <Card className="bg-muted/50 min-w-20 shrink-0">
                 <CardContent className="p-3">
                   <div className="flex flex-col items-center gap-2">
-                    <div className="text-xs text-muted-foreground font-medium">{hour.time}</div>
+                    <div className="text-xs text-muted-foreground font-medium">
+                      {hour.time}
+                    </div>
                     <div>{getWeatherIcon(hour.SKY, hour.PTY)}</div>
                     <div className="text-lg font-semibold">{hour.TMP}°</div>
                     <div className="flex items-center gap-1 text-xs text-muted-foreground">
