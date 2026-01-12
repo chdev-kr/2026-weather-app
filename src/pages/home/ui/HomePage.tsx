@@ -31,7 +31,8 @@ import {
 } from "@/shared/lib/midterm-parser";
 
 export const HomePage = () => {
-  const { currentLocation, setCurrentLocation, clearCurrentLocation } = useLocationStore();
+  const { currentLocation, setCurrentLocation, clearCurrentLocation } =
+    useLocationStore();
   const { favorites } = useFavoritesStore();
 
   // 1. 현재 위치 가져오기 (GPS)
@@ -320,14 +321,74 @@ export const HomePage = () => {
     refetch();
   };
 
+  // 메타 태그 업데이트 (메인)
+  useEffect(() => {
+    // 기본 제목
+    const title = "웨더온 - 오늘의 날씨는?";
+    document.title = title;
+
+    // 메타 description
+    const description =
+      "현재 위치의 날씨를 확인하고 즐겨찾는 지역의 날씨를 한눈에 볼 수 있습니다.";
+
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement("meta");
+      metaDescription.setAttribute("name", "description");
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute("content", description);
+
+    // Open Graph 태그들
+    const currentUrl = window.location.href;
+
+    const ogTags = [
+      { property: "og:title", content: title },
+      { property: "og:description", content: description },
+      { property: "og:url", content: currentUrl },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: `${window.location.origin}/img/OG.jpg` },
+      { property: "og:image:width", content: "1200" },
+      { property: "og:image:height", content: "630" },
+    ];
+
+    ogTags.forEach(({ property, content }) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("property", property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    });
+
+    // Twitter Card 태그들
+    const twitterTags = [
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: title },
+      { name: "twitter:description", content: description },
+      { name: "twitter:image", content: `${window.location.origin}/img/OG.jpg` },
+    ];
+
+    twitterTags.forEach(({ name, content }) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement("meta");
+        tag.setAttribute("name", name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute("content", content);
+    });
+  }, []);
+
   return (
     <>
       {/* 헤더 */}
       <Header />
 
       {/* 메인 콘텐츠 */}
-      <main className="flex-1 p-3 sm:p-4 lg:p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="flex-1 py-6 px-3 sm:py-8 sm:px-4 lg:py-10 lg:px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
           {/* 검색바 */}
           <SearchBar />
 
@@ -364,23 +425,16 @@ export const HomePage = () => {
 
           {/* 시간별 예보 */}
           {(isLoading || hourlyData.length > 0) && (
-            <HourlyForecast
-              hourlyData={hourlyData}
-              isLoading={isLoading}
-            />
+            <HourlyForecast hourlyData={hourlyData} isLoading={isLoading} />
           )}
 
           {/* 주간 예보 */}
           {(isLoading || weeklyData.length > 0) && (
-            <WeeklyForecast
-              weeklyData={weeklyData}
-              isLoading={isLoading}
-            />
+            <WeeklyForecast weeklyData={weeklyData} isLoading={isLoading} />
           )}
         </div>
       </main>
 
-      {/* 푸터 */}
       <Footer lastUpdate={lastUpdateTime} />
     </>
   );

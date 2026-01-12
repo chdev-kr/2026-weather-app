@@ -157,6 +157,87 @@ export const WeatherDetail = () => {
     refetch();
   } : undefined;
 
+  // 메타 태그 업데이트
+  useEffect(() => {
+    if (!locationInfo || !currentWeather) return;
+
+    const location = locationInfo.address;
+    const temp = currentWeather.tmp;
+
+    // 날씨 상태 텍스트
+    let weatherText = "맑음";
+    if (currentWeather.pty !== "0") {
+      if (currentWeather.pty === "1") weatherText = "비";
+      else if (currentWeather.pty === "2") weatherText = "비/눈";
+      else if (currentWeather.pty === "3") weatherText = "눈";
+    } else if (currentWeather.sky === "3") {
+      weatherText = "구름많음";
+    } else if (currentWeather.sky === "4") {
+      weatherText = "흐림";
+    }
+
+    // 페이지 제목
+    const title = `${location} 날씨 - 현재 ${temp}° (${weatherText})`;
+    document.title = title;
+
+    // 메타 description
+    const description = `${location}의 날씨 정보를 확인하세요. 현재 기온 ${temp}°, 최저 ${minMaxTemp.min}° / 최고 ${minMaxTemp.max}°`;
+
+    let metaDescription = document.querySelector('meta[name="description"]');
+    if (!metaDescription) {
+      metaDescription = document.createElement('meta');
+      metaDescription.setAttribute('name', 'description');
+      document.head.appendChild(metaDescription);
+    }
+    metaDescription.setAttribute('content', description);
+
+    // Open Graph 태그들
+    const currentUrl = window.location.href;
+
+    const ogTags = [
+      { property: 'og:title', content: title },
+      { property: 'og:description', content: description },
+      { property: 'og:url', content: currentUrl },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:image', content: `${window.location.origin}/img/OG.jpg` },
+      { property: 'og:image:width', content: '1200' },
+      { property: 'og:image:height', content: '630' },
+    ];
+
+    ogTags.forEach(({ property, content }) => {
+      let tag = document.querySelector(`meta[property="${property}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('property', property);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    });
+
+    // Twitter Card 태그들
+    const twitterTags = [
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: title },
+      { name: 'twitter:description', content: description },
+      { name: 'twitter:image', content: `${window.location.origin}/img/OG.jpg` },
+    ];
+
+    twitterTags.forEach(({ name, content }) => {
+      let tag = document.querySelector(`meta[name="${name}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute('name', name);
+        document.head.appendChild(tag);
+      }
+      tag.setAttribute('content', content);
+    });
+
+    // 컴포넌트 언마운트 시 기본 제목으로 복원
+    return () => {
+      document.title = '날씨 앱';
+    };
+  }, [locationInfo, currentWeather, minMaxTemp]);
+
   if (!locationInfo) {
     return null;
   }
@@ -165,8 +246,8 @@ export const WeatherDetail = () => {
     <>
       <Header showBackButton />
 
-      <main className="flex-1 p-3 sm:p-4 lg:p-6">
-        <div className="max-w-6xl mx-auto space-y-6">
+      <main className="flex-1 py-6 px-3 sm:py-8 sm:px-4 lg:py-10 lg:px-6">
+        <div className="max-w-6xl mx-auto space-y-8">
           {/* 현재 날씨 히어로 */}
           <CurrentWeatherHero
             location={locationInfo.address}

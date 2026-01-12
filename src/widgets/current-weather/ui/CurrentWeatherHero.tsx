@@ -9,6 +9,7 @@ import {
   ArrowDown,
   ArrowUp,
   RefreshCcw,
+  Share2,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -126,6 +127,18 @@ export const CurrentWeatherHero = ({
 
   const isCurrentlyFavorite = isFavorite(location);
 
+  // URL 복사 핸들러
+  const handleCopyUrl = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    const url = window.location.href;
+    navigator.clipboard.writeText(url).then(() => {
+      toast.success("URL이 복사되었습니다.");
+    }).catch(() => {
+      toast.error("URL 복사에 실패했습니다.");
+    });
+  };
+
   // 로딩 스켈레톤
   if (isLoading) {
     return (
@@ -207,6 +220,11 @@ export const CurrentWeatherHero = ({
               <RefreshCcw className="w-5 h-5 text-muted-foreground" />
             </Button>
           )}
+
+          {/* URL 복사 버튼 */}
+          <Button variant="ghost" size="icon" onClick={handleCopyUrl}>
+            <Share2 className="w-5 h-5 text-muted-foreground" />
+          </Button>
 
           {/* 즐겨찾기 버튼 */}
           <Button variant="ghost" size="icon" onClick={handleToggleFavorite}>
