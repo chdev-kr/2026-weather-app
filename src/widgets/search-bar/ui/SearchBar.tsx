@@ -193,9 +193,7 @@ export const SearchBar = () => {
                   ref={isSelected ? selectedItemRef : null}
                   onClick={() => handleSelectAddress(district)}
                   className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-b last:border-b-0 ${
-                    isSelected
-                      ? "bg-accent"
-                      : "hover:bg-accent"
+                    isSelected ? "bg-accent" : "hover:bg-accent"
                   }`}
                 >
                   <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
@@ -227,7 +225,7 @@ export const SearchBar = () => {
         <Card className="absolute top-full mt-2 w-full z-50">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground text-center">
-              검색 결과가 없습니다.
+              검색 결과가 없습니다. 해당 장소의 정보가 제공되지 않습니다.
             </p>
           </CardContent>
         </Card>
