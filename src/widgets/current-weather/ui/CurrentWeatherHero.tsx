@@ -89,20 +89,13 @@ export const CurrentWeatherHero = ({
   const getWeatherIcon = () => {
     if (pty !== "0") {
       if (pty === "1")
-        return (
-          <CloudRain className="w-12 h-12 sm:w-14 sm:h-14 text-blue-500" />
-        );
+        return <CloudRain className="w-full h-full text-blue-500" />;
       if (pty === "3")
-        return (
-          <CloudSnow className="w-12 h-12 sm:w-14 sm:h-14 text-blue-300" />
-        );
-      return <CloudRain className="w-12 h-12 sm:w-14 sm:h-14 text-blue-500" />;
+        return <CloudSnow className="w-full h-full text-blue-300" />;
+      return <CloudRain className="w-full h-full text-blue-500" />;
     }
-    if (sky === "1")
-      return <Sun className="w-12 h-12 sm:w-14 sm:h-14 text-yellow-500" />;
-    return (
-      <Cloud className="w-12 h-12 sm:w-14 sm:h-14 text-muted-foreground" />
-    );
+    if (sky === "1") return <Sun className="w-full h-full text-yellow-500" />;
+    return <Cloud className="w-full h-full text-muted-foreground" />;
   };
 
   const getWeatherText = () => {
@@ -120,12 +113,12 @@ export const CurrentWeatherHero = ({
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3 px-1">
+      <h2 className="text-base sm:text-lg font-bold mb-3 px-1">
         현재 위치 날씨
       </h2>
       <Card
-        className={`relative bg-muted/50 ${
-          clickable ? "cursor-pointer hover:bg-muted/70 transition-colors" : ""
+        className={`relative border-2 bg-card ${
+          clickable ? "cursor-pointer hover:border-3 transition-all" : ""
         }`}
         onClick={handleClick}
       >
@@ -146,11 +139,7 @@ export const CurrentWeatherHero = ({
           )}
 
           {/* 즐겨찾기 버튼 */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={handleToggleFavorite}
-          >
+          <Button variant="ghost" size="icon" onClick={handleToggleFavorite}>
             <Star
               className={`w-5 h-5 ${
                 isCurrentlyFavorite
@@ -161,40 +150,52 @@ export const CurrentWeatherHero = ({
           </Button>
         </div>
 
-        <CardContent className="pt-5 pb-5">
-          {/* 위치 */}
-          <div className="flex items-center justify-center gap-2 mb-3">
-            <MapPin className="w-4 h-4 text-muted-foreground" />
-            <h2 className="text-base sm:text-lg font-semibold">{location}</h2>
-          </div>
-
-          {/* 날씨 아이콘과 온도 */}
-          <div className="flex flex-col items-center justify-center mb-3">
-            <div className="mb-2">{getWeatherIcon()}</div>
-            <div className="text-4xl sm:text-5xl font-light mb-1">
-              {temperature}°
-            </div>
-            <div className="text-base sm:text-lg text-muted-foreground">
-              {getWeatherText()}
-            </div>
-          </div>
-
-          {/* 최저/최고 온도 및 강수확률 */}
-          <div className="flex items-center justify-center gap-3 flex-wrap">
-            <div className="flex items-center gap-1.5 text-sm font-semibold">
-              <div className="flex items-center gap-0.5 text-blue-600">
-                <ArrowDown className="w-3.5 h-3.5" />
-                <span>{tempMin}°</span>
+        <CardContent className="pt-6 pb-6 px-8 sm:px-12">
+          {/* 좌우 배치 레이아웃 */}
+          <div className="flex items-center justify-center gap-10 sm:gap-20">
+            {/* 왼쪽: 날씨 아이콘 영역 */}
+            <div className="flex flex-col items-center justify-center gap-2 shrink-0">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 flex items-center justify-center">
+                {getWeatherIcon()}
               </div>
-              <span className="text-muted-foreground">/</span>
-              <div className="flex items-center gap-0.5 text-red-600">
-                <ArrowUp className="w-3.5 h-3.5" />
-                <span>{tempMax}°</span>
-              </div>
+              <span className="text-sm sm:text-md text-muted-foreground font-medium">
+                {getWeatherText()}
+              </span>
             </div>
-            <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-              <Droplets className="w-4 h-4" />
-              <span>{pop}%</span>
+
+            {/* 오른쪽: 정보 영역 */}
+            <div className="space-y-2 sm:space-y-3">
+              {/* 위치 */}
+              <div className="flex items-center gap-2">
+                <MapPin className="w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground shrink-0" />
+                <h3 className="text-sm sm:text-base font-semibold truncate">
+                  {location}
+                </h3>
+              </div>
+
+              {/* 온도 */}
+              <div className="text-5xl sm:text-6xl font-bold leading-none">
+                {temperature}°
+              </div>
+
+              {/* 최저/최고 온도 */}
+              <div className="flex items-center gap-2 sm:gap-3 text-md sm:text-base font-bold">
+                <div className="flex items-center gap-1 text-blue-600">
+                  <ArrowDown className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>{tempMin}°</span>
+                </div>
+                <span className="text-muted-foreground">/</span>
+                <div className="flex items-center gap-1 text-red-600">
+                  <ArrowUp className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <span>{tempMax}°</span>
+                </div>
+              </div>
+
+              {/* 강수확률 */}
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                <Droplets className="w-4 h-4" />
+                <span>강수확률 {pop}%</span>
+              </div>
             </div>
           </div>
         </CardContent>

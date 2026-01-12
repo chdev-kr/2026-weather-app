@@ -16,6 +16,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
+import { toast } from "sonner";
 
 interface WeatherCardProps {
   id?: number | string; // 위치 ID (선택) - 숫자 또는 UUID 문자열
@@ -50,7 +51,7 @@ export const WeatherCard = ({
 
     // 변경사항이 있을 때만 저장
     if (editedLocation.trim() && editedLocation !== location) {
-      if (typeof id === 'string') {
+      if (typeof id === "string") {
         updateFavoriteName(id, editedLocation.trim());
       } else {
         const favorite = favorites[id - 1];
@@ -68,9 +69,9 @@ export const WeatherCard = ({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleLocationSave();
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       handleLocationCancel();
     }
   };
@@ -90,18 +91,36 @@ export const WeatherCard = ({
 
     // id가 UUID 문자열이면 그대로 사용
     if (typeof id === "string") {
-      if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
-        removeFavorite(id);
-      }
+      toast(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`, {
+        action: {
+          label: "삭제",
+          onClick: () => {
+            removeFavorite(id);
+            toast.success("삭제가 완료되었습니다.");
+          },
+        },
+        cancel: {
+          label: "취소",
+          onClick: () => {},
+        },
+      });
     } else {
       // id가 숫자면 favorites에서 찾기
       const favorite = favorites[id - 1]; // 1부터 시작하므로 -1
       if (favorite) {
-        if (
-          window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)
-        ) {
-          removeFavorite(favorite.id);
-        }
+        toast(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`, {
+          action: {
+            label: "삭제",
+            onClick: () => {
+              removeFavorite(favorite.id);
+              toast.success("삭제가 완료되었습니다.");
+            },
+          },
+          cancel: {
+            label: "취소",
+            onClick: () => {},
+          },
+        });
       }
     }
   };
