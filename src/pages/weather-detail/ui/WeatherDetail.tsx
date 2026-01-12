@@ -8,6 +8,7 @@ import { WeeklyForecast } from "@/widgets/weekly-forecast/ui/WeeklyForecast";
 import { WeatherDetails } from "@/widgets/weather-details/ui/WeatherDetails";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 import { useLocationStore } from "@/shared/store/useLocationStore";
+import { useGeolocation } from "@/shared/hooks/useGeolocation";
 import { convertGpsToGrid } from "@/shared/lib/coordinate-converter";
 import {
   useShortTermForecast,
@@ -32,7 +33,8 @@ export const WeatherDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { favorites } = useFavoritesStore();
-  const { currentLocation } = useLocationStore();
+  const { currentLocation, clearCurrentLocation } = useLocationStore();
+  const { refetch } = useGeolocation(false);
 
   // id에 따라 위치 정보 결정
   const locationInfo = useMemo(() => {
@@ -149,6 +151,12 @@ export const WeatherDetail = () => {
   // 로딩 상태
   const isLoading = weatherLoading || !currentWeather || !locationInfo;
 
+  // 현재 위치 새로고침 핸들러 (현재 위치일 때만)
+  const handleRefreshLocation = id === "current" ? () => {
+    clearCurrentLocation();
+    refetch();
+  } : undefined;
+
   if (!locationInfo) {
     return null;
   }
@@ -178,6 +186,7 @@ export const WeatherDetail = () => {
               pop={currentWeather.pop}
               latitude={locationInfo.latitude}
               longitude={locationInfo.longitude}
+              onRefreshLocation={handleRefreshLocation}
             />
           )}
 

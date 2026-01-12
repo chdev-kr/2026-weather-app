@@ -8,6 +8,7 @@ import {
   Star,
   ArrowDown,
   ArrowUp,
+  RefreshCcw,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -26,6 +27,7 @@ interface CurrentWeatherHeroProps {
   locationId?: string;
   latitude?: number;
   longitude?: number;
+  onRefreshLocation?: () => void;
 }
 
 export const CurrentWeatherHero = ({
@@ -40,9 +42,11 @@ export const CurrentWeatherHero = ({
   locationId = "1",
   latitude,
   longitude,
+  onRefreshLocation,
 }: CurrentWeatherHeroProps) => {
   const navigate = useNavigate();
-  const { addFavorite, removeFavorite, isFavorite, favorites } = useFavoritesStore();
+  const { addFavorite, removeFavorite, isFavorite, favorites } =
+    useFavoritesStore();
 
   const handleClick = () => {
     if (clickable) {
@@ -65,7 +69,9 @@ export const CurrentWeatherHero = ({
       // 즐겨찾기에서 삭제
       const favorite = favorites.find((fav) => fav.address === location);
       if (favorite) {
-        if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
+        if (
+          window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)
+        ) {
           removeFavorite(favorite.id);
         }
       }
@@ -114,26 +120,46 @@ export const CurrentWeatherHero = ({
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3">현재 위치 날씨</h2>
+      <h2 className="text-base sm:text-lg font-semibold mb-3 px-1">
+        현재 위치 날씨
+      </h2>
       <Card
-        className={`relative bg-muted/50 ${clickable ? 'cursor-pointer hover:bg-muted/70 transition-colors' : ''}`}
+        className={`relative bg-muted/50 ${
+          clickable ? "cursor-pointer hover:bg-muted/70 transition-colors" : ""
+        }`}
         onClick={handleClick}
       >
-        {/* 즐겨찾기 버튼 */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="absolute top-3 right-3 z-10"
-          onClick={handleToggleFavorite}
-        >
-          <Star
-            className={`w-5 h-5 ${
-              isCurrentlyFavorite
-                ? "fill-yellow-400 text-yellow-400"
-                : "text-muted-foreground"
-            }`}
-          />
-        </Button>
+        {/* 우측 상단 버튼들 */}
+        <div className="absolute top-3 right-3 z-10 flex gap-1">
+          {/* 위치 새로고침 버튼 (현재 위치일 때만 표시) */}
+          {onRefreshLocation && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={(e) => {
+                e.stopPropagation();
+                onRefreshLocation();
+              }}
+            >
+              <RefreshCcw className="w-5 h-5 text-muted-foreground" />
+            </Button>
+          )}
+
+          {/* 즐겨찾기 버튼 */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleToggleFavorite}
+          >
+            <Star
+              className={`w-5 h-5 ${
+                isCurrentlyFavorite
+                  ? "fill-yellow-400 text-yellow-400"
+                  : "text-muted-foreground"
+              }`}
+            />
+          </Button>
+        </div>
 
         <CardContent className="pt-5 pb-5">
           {/* 위치 */}
