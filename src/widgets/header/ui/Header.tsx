@@ -6,8 +6,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useThemeStore } from "@/shared/store/useThemeStore";
 
 interface HeaderProps {
   showBackButton?: boolean;
@@ -15,27 +15,7 @@ interface HeaderProps {
 
 export const Header = ({ showBackButton = false }: HeaderProps) => {
   const navigate = useNavigate();
-  const [theme, setTheme] = useState<"default" | "light" | "dark">("dark");
-
-  const handleThemeChange = (newTheme: "default" | "light" | "dark") => {
-    setTheme(newTheme);
-    const root = document.documentElement;
-
-    if (newTheme === "dark") {
-      root.classList.add("dark");
-    } else if (newTheme === "light") {
-      root.classList.remove("dark");
-    } else {
-      const systemPrefersDark = window.matchMedia(
-        "(prefers-color-scheme: dark)"
-      ).matches;
-      if (systemPrefersDark) {
-        root.classList.add("dark");
-      } else {
-        root.classList.remove("dark");
-      }
-    }
-  };
+  const { theme, setTheme } = useThemeStore();
 
   const getThemeIcon = () => {
     if (theme === "dark") return <Moon className="w-5 h-5" />;
@@ -61,7 +41,7 @@ export const Header = ({ showBackButton = false }: HeaderProps) => {
           {!showBackButton && (
             <button
               onClick={() => navigate("/")}
-              className="flex items-center gap-2 cursor-pointer"
+              className="flex items-center gap-1 cursor-pointer"
             >
               <img
                 src="/img/logo.png"
@@ -81,15 +61,15 @@ export const Header = ({ showBackButton = false }: HeaderProps) => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => handleThemeChange("default")}>
+              <DropdownMenuItem onClick={() => setTheme("default")}>
                 <Monitor className="w-4 h-4 mr-2" />
                 기본 모드
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleThemeChange("light")}>
+              <DropdownMenuItem onClick={() => setTheme("light")}>
                 <Sun className="w-4 h-4 mr-2" />
                 라이트 모드
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => handleThemeChange("dark")}>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
                 <Moon className="w-4 h-4 mr-2" />
                 다크 모드
               </DropdownMenuItem>
