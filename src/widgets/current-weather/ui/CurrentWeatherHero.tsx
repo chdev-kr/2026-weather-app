@@ -14,6 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
+import { toast } from "sonner";
 
 interface CurrentWeatherHeroProps {
   location: string;
@@ -59,7 +60,7 @@ export const CurrentWeatherHero = ({
     e.stopPropagation();
 
     if (!latitude || !longitude) {
-      alert("위치 정보를 불러올 수 없습니다.");
+      toast.error("위치 정보를 불러올 수 없습니다.");
       return;
     }
 
@@ -69,20 +70,32 @@ export const CurrentWeatherHero = ({
       // 즐겨찾기에서 삭제
       const favorite = favorites.find((fav) => fav.address === location);
       if (favorite) {
-        if (
-          window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)
-        ) {
-          removeFavorite(favorite.id);
-        }
+        toast(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`, {
+          action: {
+            label: "삭제",
+            onClick: () => {
+              removeFavorite(favorite.id);
+              toast.success("삭제가 완료되었습니다.");
+            },
+          },
+          cancel: {
+            label: "취소",
+            onClick: () => {},
+          },
+        });
       }
     } else {
       // 즐겨찾기에 추가
-      addFavorite({
+      const success = addFavorite({
         name: location,
         address: location,
         latitude,
         longitude,
       });
+
+      if (success) {
+        toast.success("즐겨찾기에 추가되었습니다.");
+      }
     }
   };
 

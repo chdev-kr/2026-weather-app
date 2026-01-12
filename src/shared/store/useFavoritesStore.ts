@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { toast } from 'sonner';
 
 export interface Favorite {
   id: string;
@@ -11,7 +12,7 @@ export interface Favorite {
 
 interface FavoritesState {
   favorites: Favorite[];
-  addFavorite: (favorite: Omit<Favorite, 'id'>) => void;
+  addFavorite: (favorite: Omit<Favorite, 'id'>) => boolean;
   removeFavorite: (id: string) => void;
   updateFavoriteName: (id: string, name: string) => void;
   isFavorite: (address: string) => boolean;
@@ -28,8 +29,8 @@ export const useFavoritesStore = create<FavoritesState>()(
 
         // 최대 6개 제한
         if (favorites.length >= 6) {
-          alert('즐겨찾기는 최대 6개까지 추가할 수 있습니다.');
-          return;
+          toast.warning('즐겨찾기는 최대 6개까지 추가할 수 있습니다.');
+          return false;
         }
 
         // 중복 체크
@@ -38,8 +39,8 @@ export const useFavoritesStore = create<FavoritesState>()(
         );
 
         if (isDuplicate) {
-          alert('이미 즐겨찾기에 추가된 장소입니다.');
-          return;
+          toast.warning('이미 즐겨찾기에 추가된 장소입니다.');
+          return false;
         }
 
         const newFavorite: Favorite = {
@@ -48,6 +49,7 @@ export const useFavoritesStore = create<FavoritesState>()(
         };
 
         set({ favorites: [...favorites, newFavorite] });
+        return true;
       },
 
       removeFavorite: (id) => {
