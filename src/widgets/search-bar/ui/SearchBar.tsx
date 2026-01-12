@@ -7,6 +7,7 @@ import koreaDistricts from "@/shared/data/korea_districts.json";
 import { address2Coord } from "@/shared/lib/nominatim-geocoder";
 import { useLocationStore } from "@/shared/store/useLocationStore";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
+import { toast } from "sonner";
 
 export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -24,11 +25,14 @@ export const SearchBar = () => {
     }
 
     const query = searchTerm.trim();
+    // 공백을 하이픈으로 변환하여 검색 (동구 자양동 -> 동구-자양동)
+    const queryWithHyphen = query.replace(/\s+/g, "-");
 
     // 검색어와 일치하는 주소를 찾기
     const results = koreaDistricts
       .filter((district: string) => {
-        return district.includes(query);
+        // 원본 검색어와 하이픈 변환 검색어 둘 다 검색
+        return district.includes(query) || district.includes(queryWithHyphen);
       })
       .slice(0, 15); // 최대 15개 표시
 
@@ -72,11 +76,11 @@ export const SearchBar = () => {
         setSearchTerm("");
         setSelectedIndex(-1);
       } else {
-        alert("주소를 찾을 수 없습니다. 다른 주소를 시도해주세요.");
+        toast.error("주소를 찾을 수 없습니다. 다른 주소를 시도해주세요.");
       }
     } catch (error) {
       console.error("주소 검색 오류:", error);
-      alert("주소 검색 중 오류가 발생했습니다.");
+      toast.error("주소 검색 중 오류가 발생했습니다.");
     } finally {
       setIsLoading(false);
     }
@@ -91,29 +95,27 @@ export const SearchBar = () => {
 
     const formattedAddress = address.replace(/-/g, " ");
 
-    // 이미 즐겨찾기에 있는지 확인
-    if (isFavorite(formattedAddress)) {
-      alert("이미 즐겨찾기에 추가된 장소입니다.");
-      return;
-    }
-
     try {
       // 주소를 좌표로 변환
       const coords = await address2Coord(formattedAddress);
 
       if (coords) {
-        addFavorite({
+        const success = addFavorite({
           name: formattedAddress,
           address: formattedAddress,
           latitude: coords.latitude,
           longitude: coords.longitude,
         });
+
+        if (success) {
+          toast.success("즐겨찾기에 추가되었습니다.");
+        }
       } else {
-        alert("주소를 찾을 수 없습니다.");
+        toast.error("주소를 찾을 수 없습니다.");
       }
     } catch (error) {
       console.error("즐겨찾기 추가 오류:", error);
-      alert("즐겨찾기 추가 중 오류가 발생했습니다.");
+      toast.error("즐겨찾기 추가 중 오류가 발생했습니다.");
     }
   };
 
@@ -179,7 +181,7 @@ export const SearchBar = () => {
       </div>
 
       {searchResults.length > 0 && !isLoading && (
-        <Card className="absolute top-full mt-2 w-full z-50 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+        <Card className="absolute top-full mt-2 w-full z-50 max-h-80 overflow-y-auto scrollbar-hide">
           <CardContent className="p-0">
             {searchResults.map((district, index) => {
               // 하이픈을 공백으로 변환하여 표시
