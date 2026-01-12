@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
 interface FavoriteLocation {
-  id: number;
+  id: number | string;
   province: string;
   district: string;
   temperature: string;
@@ -13,6 +13,7 @@ interface FavoriteLocation {
   sky: string;
   pty: string;
   pop: string;
+  isLoading?: boolean;
 }
 
 interface FavoritesListProps {
@@ -73,6 +74,7 @@ export const FavoritesList = ({ favorites }: FavoritesListProps) => {
                       sky={favorite.sky}
                       pty={favorite.pty}
                       pop={favorite.pop}
+                      isLoading={favorite.isLoading}
                     />
                   </div>
                 ))}
@@ -93,6 +95,7 @@ export const FavoritesList = ({ favorites }: FavoritesListProps) => {
                 sky={favorite.sky}
                 pty={favorite.pty}
                 pop={favorite.pop}
+                isLoading={favorite.isLoading}
               />
             ))}
           </div>

@@ -26,6 +26,7 @@ interface WeatherCardProps {
   sky: string; // 하늘 상태 (1:맑음, 3:구름많음, 4:흐림)
   pty: string; // 강수형태 (0:없음, 1:비, 2:비/눈, 3:눈)
   pop?: string; // 강수확률 (선택)
+  isLoading?: boolean; // 로딩 상태
 }
 
 export const WeatherCard = ({
@@ -37,6 +38,7 @@ export const WeatherCard = ({
   sky,
   pty,
   pop,
+  isLoading = false,
 }: WeatherCardProps) => {
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
@@ -66,7 +68,7 @@ export const WeatherCard = ({
     if (!id) return;
 
     // id가 UUID 문자열이면 그대로 사용
-    if (typeof id === 'string') {
+    if (typeof id === "string") {
       if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
         removeFavorite(id);
       }
@@ -74,7 +76,9 @@ export const WeatherCard = ({
       // id가 숫자면 favorites에서 찾기
       const favorite = favorites[id - 1]; // 1부터 시작하므로 -1
       if (favorite) {
-        if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
+        if (
+          window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)
+        ) {
           removeFavorite(favorite.id);
         }
       }
@@ -103,6 +107,46 @@ export const WeatherCard = ({
     if (sky === "3") return "구름많음";
     return "흐림";
   };
+
+  // 로딩 스켈레톤
+  if (isLoading) {
+    return (
+      <Card className="bg-muted/50 min-w-70 relative animate-pulse">
+        {/* 삭제 버튼 스켈레톤 */}
+        {id && (
+          <div className="absolute top-2 right-2 h-6 w-6 bg-muted rounded-full" />
+        )}
+
+        <CardContent className="py-3 px-8">
+          <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-col gap-2 flex-1 min-w-0">
+              {/* 위치 이름 스켈레톤 */}
+              <div className="h-5 w-24 bg-muted rounded" />
+
+              {/* 온도 스켈레톤 */}
+              <div className="h-8 w-16 bg-muted rounded" />
+
+              {/* 최저/최고 온도 스켈레톤 */}
+              <div className="flex items-center gap-1.5">
+                <div className="h-4 w-12 bg-muted rounded" />
+                <div className="h-4 w-1 bg-muted rounded" />
+                <div className="h-4 w-12 bg-muted rounded" />
+              </div>
+
+              {/* 강수확률 스켈레톤 */}
+              {pop && <div className="h-4 w-16 bg-muted rounded" />}
+            </div>
+
+            {/* 날씨 아이콘 스켈레톤 */}
+            <div className="flex flex-col items-center gap-1.5 shrink-0">
+              <div className="w-12 h-12 bg-muted rounded-full" />
+              <div className="h-3 w-12 bg-muted rounded" />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
     <Card

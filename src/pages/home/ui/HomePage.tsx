@@ -171,12 +171,16 @@ export const HomePage = () => {
 
     return favorites.map((fav, index) => {
       const parts = fav.address.split(' ');
-      const province = parts[0] || '';
-      const district = parts[1] || '';
+      // province: 구/군 (parts[1]), district: 동/읍/면 (parts[2])
+      const province = parts[1] || parts[0] || '';
+      const district = parts[2] || parts[1] || '';
 
       // 해당 즐겨찾기의 날씨 데이터
       const weatherData = weatherDataArray[index];
       const items = weatherData?.response?.body?.items?.item;
+
+      // 데이터가 로딩 중인지 확인
+      const isLoading = !items;
 
       if (items) {
         const current = getCurrentWeatherData(items);
@@ -193,6 +197,7 @@ export const HomePage = () => {
             sky: current.sky,
             pty: current.pty,
             pop: current.pop,
+            isLoading: false,
           };
         }
       }
@@ -208,6 +213,7 @@ export const HomePage = () => {
         sky: "1",
         pty: "0",
         pop: "-",
+        isLoading,
       };
     });
   }, [favorites, weather0, weather1, weather2, weather3, weather4, weather5, baseDate]);
