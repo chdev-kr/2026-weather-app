@@ -1,16 +1,21 @@
-import { Search, MapPin } from "lucide-react";
+import { Search, MapPin, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useState, useMemo, useRef, useEffect } from "react";
 import koreaDistricts from "@/shared/data/korea_districts.json";
 import { address2Coord } from "@/shared/lib/nominatim-geocoder";
 import { useLocationStore } from "@/shared/store/useLocationStore";
+import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 
 export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedIndex, setSelectedIndex] = useState(-1);
   const { setCurrentLocation } = useLocationStore();
+  const { addFavorite, isFavorite } = useFavoritesStore();
   const searchRef = useRef<HTMLDivElement>(null);
+  const selectedItemRef = useRef<HTMLDivElement>(null);
 
   // korea_districts.json에서 검색어에 맞는 주소 필터링
   const searchResults = useMemo(() => {
@@ -29,6 +34,21 @@ export const SearchBar = () => {
 
     return results;
   }, [searchTerm]);
+
+  // 검색 결과가 바뀌면 선택 인덱스 초기화
+  useEffect(() => {
+    setSelectedIndex(-1);
+  }, [searchResults]);
+
+  // 선택된 항목이 바뀌면 스크롤
+  useEffect(() => {
+    if (selectedItemRef.current && selectedIndex >= 0) {
+      selectedItemRef.current.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+    }
+  }, [selectedIndex]);
 
   // 검색 결과 클릭 시 해당 위치로 이동
   const handleSelectAddress = async (address: string) => {
@@ -50,6 +70,7 @@ export const SearchBar = () => {
 
         // 검색창 초기화
         setSearchTerm("");
+        setSelectedIndex(-1);
       } else {
         alert("주소를 찾을 수 없습니다. 다른 주소를 시도해주세요.");
       }
@@ -61,6 +82,69 @@ export const SearchBar = () => {
     }
   };
 
+  // 즐겨찾기 추가
+  const handleAddFavorite = async (
+    address: string,
+    event: React.MouseEvent
+  ) => {
+    event.stopPropagation(); // 이벤트 버블링 방지
+
+    const formattedAddress = address.replace(/-/g, " ");
+
+    // 이미 즐겨찾기에 있는지 확인
+    if (isFavorite(formattedAddress)) {
+      alert("이미 즐겨찾기에 추가된 장소입니다.");
+      return;
+    }
+
+    try {
+      // 주소를 좌표로 변환
+      const coords = await address2Coord(formattedAddress);
+
+      if (coords) {
+        addFavorite({
+          name: formattedAddress,
+          address: formattedAddress,
+          latitude: coords.latitude,
+          longitude: coords.longitude,
+        });
+      } else {
+        alert("주소를 찾을 수 없습니다.");
+      }
+    } catch (error) {
+      console.error("즐겨찾기 추가 오류:", error);
+      alert("즐겨찾기 추가 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 키보드 네비게이션
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (searchResults.length === 0) return;
+
+    switch (e.key) {
+      case "ArrowDown":
+        e.preventDefault();
+        setSelectedIndex((prev) =>
+          prev < searchResults.length - 1 ? prev + 1 : prev
+        );
+        break;
+      case "ArrowUp":
+        e.preventDefault();
+        setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+        break;
+      case "Enter":
+        e.preventDefault();
+        if (selectedIndex >= 0 && selectedIndex < searchResults.length) {
+          handleSelectAddress(searchResults[selectedIndex]);
+        }
+        break;
+      case "Escape":
+        setSearchTerm("");
+        setSelectedIndex(-1);
+        break;
+    }
+  };
+
   // 검색창 외부 클릭 시 닫기
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,6 +153,7 @@ export const SearchBar = () => {
         !searchRef.current.contains(event.target as Node)
       ) {
         setSearchTerm("");
+        setSelectedIndex(-1);
       }
     };
 
@@ -87,28 +172,50 @@ export const SearchBar = () => {
           placeholder="날씨가 궁금한 지역을 검색해주세요 예) 서울특별시, 마포구, 동교동"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={handleKeyDown}
           className="pl-12 pr-4 py-6 text-base"
           disabled={isLoading}
         />
       </div>
 
-      {searchResults.length > 0 && (
-        <Card className="absolute top-full mt-2 w-full z-10 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
+      {searchResults.length > 0 && !isLoading && (
+        <Card className="absolute top-full mt-2 w-full z-50 max-h-80 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-transparent hover:scrollbar-thumb-gray-400">
           <CardContent className="p-0">
             {searchResults.map((district, index) => {
               // 하이픈을 공백으로 변환하여 표시
               const displayAddress = district.replace(/-/g, " ");
+              const isAlreadyFavorite = isFavorite(displayAddress);
+              const isSelected = index === selectedIndex;
 
               return (
                 <div
                   key={index}
+                  ref={isSelected ? selectedItemRef : null}
                   onClick={() => handleSelectAddress(district)}
-                  className="flex items-center gap-3 p-4 hover:bg-accent cursor-pointer transition-colors border-b last:border-b-0"
+                  className={`flex items-center gap-3 p-4 cursor-pointer transition-colors border-b last:border-b-0 ${
+                    isSelected
+                      ? "bg-accent"
+                      : "hover:bg-accent"
+                  }`}
                 >
                   <MapPin className="w-4 h-4 text-muted-foreground shrink-0" />
                   <div className="flex-1">
                     <p className="text-sm font-medium">{displayAddress}</p>
                   </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="shrink-0"
+                    onClick={(e) => handleAddFavorite(district, e)}
+                  >
+                    <Star
+                      className={`w-4 h-4 ${
+                        isAlreadyFavorite
+                          ? "fill-yellow-400 text-yellow-400"
+                          : "text-muted-foreground"
+                      }`}
+                    />
+                  </Button>
                 </div>
               );
             })}
@@ -116,8 +223,8 @@ export const SearchBar = () => {
         </Card>
       )}
 
-      {searchTerm && searchResults.length === 0 && (
-        <Card className="absolute top-full mt-2 w-full z-10">
+      {searchTerm && searchResults.length === 0 && !isLoading && (
+        <Card className="absolute top-full mt-2 w-full z-50">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground text-center">
               검색 결과가 없습니다.
@@ -127,7 +234,7 @@ export const SearchBar = () => {
       )}
 
       {isLoading && (
-        <Card className="absolute top-full mt-2 w-full z-10">
+        <Card className="absolute top-full mt-2 w-full z-50">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground text-center">
               위치를 불러오는 중...
