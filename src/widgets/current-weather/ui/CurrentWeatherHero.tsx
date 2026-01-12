@@ -12,6 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 
 interface CurrentWeatherHeroProps {
   location: string;
@@ -23,6 +24,8 @@ interface CurrentWeatherHeroProps {
   pop: string;
   clickable?: boolean;
   locationId?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 export const CurrentWeatherHero = ({
@@ -35,12 +38,45 @@ export const CurrentWeatherHero = ({
   pop,
   clickable = false,
   locationId = "1",
+  latitude,
+  longitude,
 }: CurrentWeatherHeroProps) => {
   const navigate = useNavigate();
+  const { addFavorite, removeFavorite, isFavorite, favorites } = useFavoritesStore();
 
   const handleClick = () => {
     if (clickable) {
       navigate(`/weather/${locationId}`);
+    }
+  };
+
+  // 즐겨찾기 토글
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+
+    if (!latitude || !longitude) {
+      alert("위치 정보를 불러올 수 없습니다.");
+      return;
+    }
+
+    const isCurrentlyFavorite = isFavorite(location);
+
+    if (isCurrentlyFavorite) {
+      // 즐겨찾기에서 삭제
+      const favorite = favorites.find((fav) => fav.address === location);
+      if (favorite) {
+        if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
+          removeFavorite(favorite.id);
+        }
+      }
+    } else {
+      // 즐겨찾기에 추가
+      addFavorite({
+        name: location,
+        address: location,
+        latitude,
+        longitude,
+      });
     }
   };
 
@@ -74,6 +110,8 @@ export const CurrentWeatherHero = ({
     return "흐림";
   };
 
+  const isCurrentlyFavorite = isFavorite(location);
+
   return (
     <div>
       <h2 className="text-base sm:text-lg font-semibold mb-3">현재 위치 날씨</h2>
@@ -86,9 +124,15 @@ export const CurrentWeatherHero = ({
           variant="ghost"
           size="icon"
           className="absolute top-3 right-3 z-10"
-          onClick={(e) => e.stopPropagation()}
+          onClick={handleToggleFavorite}
         >
-          <Star className="w-5 h-5" />
+          <Star
+            className={`w-5 h-5 ${
+              isCurrentlyFavorite
+                ? "fill-yellow-400 text-yellow-400"
+                : "text-muted-foreground"
+            }`}
+          />
         </Button>
 
         <CardContent className="pt-5 pb-5">
