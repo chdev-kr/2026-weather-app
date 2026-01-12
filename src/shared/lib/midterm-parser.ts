@@ -30,7 +30,8 @@ export const getMidTermWeeklyForecast = (
   const days = ["일", "월", "화", "수", "목", "금", "토"];
 
   // 4일 후부터 10일 후까지(7일치)
-  // 중기예보는 4일 후부터 제공됨
+  // 중기예보 API는 발표 시점에 따라 5일 후부터 데이터 제공
+  // Day 4는 단기예보와 중기예보 사이 공백 기간이므로 "예보 준비중" 표시
   for (let i = 4; i <= 10; i++) {
     const targetDate = getDateAfterDays(baseDate, i);
     const dateObj = new Date(
@@ -50,10 +51,14 @@ export const getMidTermWeeklyForecast = (
     // 날씨 및 강수확률
     const { wfAm, wfPm, rnStAm, rnStPm } = getWeatherInfo(landData, i);
 
+    // Day 4는 데이터가 없을 수 있으므로 "예보 준비중" 표시
+    const displayWfAm = wfAm === "정보없음" ? "예보 준비중" : wfAm;
+    const displayWfPm = wfPm === "정보없음" ? "예보 준비중" : wfPm;
+
     result.push({
       date: `${month}/${date} ${dayOfWeek}`,
-      wfAm,
-      wfPm,
+      wfAm: displayWfAm,
+      wfPm: displayWfPm,
       taMin,
       taMax,
       rnStAm,
@@ -111,13 +116,8 @@ const getWeatherInfo = (
   let rnStAm = 0;
   let rnStPm = 0;
 
-  // 3~7일: 오전/오후 구분
-  if (day === 3) {
-    wfAm = data.wf3Am || "정보없음";
-    wfPm = data.wf3Pm || "정보없음";
-    rnStAm = data.rnSt3Am || 0;
-    rnStPm = data.rnSt3Pm || 0;
-  } else if (day === 4) {
+  // 4~7일: 오전/오후 구분
+  if (day === 4) {
     wfAm = data.wf4Am || "정보없음";
     wfPm = data.wf4Pm || "정보없음";
     rnStAm = data.rnSt4Am || 0;
@@ -166,24 +166,21 @@ const getWeatherInfo = (
 
 /**
  * 중기예보 API 발표 시각 계산
- * 하루 2회 발표: 06:00, 18:00
+ * 항상 06시 발표 데이터를 사용하여 Day 3, Day 4 데이터를 포함
+ * (18시 발표는 Day 3, Day 4 데이터가 없을 수 있음)
  */
 export const getMidTermForecastTime = (): string => {
   const now = new Date();
   const hour = now.getHours();
 
-  // 06시 이전이면 전날 18시 발표 시각 사용
+  // 06시 이전이면 전날 06시 발표 시각 사용
   if (hour < 6) {
     now.setDate(now.getDate() - 1);
-    now.setHours(18, 0, 0, 0);
-  }
-  // 18시 이전이면 당일 06시 발표 시각 사용
-  else if (hour < 18) {
     now.setHours(6, 0, 0, 0);
   }
-  // 18시 이후면 당일 18시 발표 시각 사용
+  // 06시 이후면 당일 06시 발표 시각 사용
   else {
-    now.setHours(18, 0, 0, 0);
+    now.setHours(6, 0, 0, 0);
   }
 
   const year = now.getFullYear();

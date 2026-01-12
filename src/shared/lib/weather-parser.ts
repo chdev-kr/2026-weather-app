@@ -133,7 +133,7 @@ export const getDailyForecastFromShortTerm = (
   const today = new Date();
   const dailyData = [];
 
-  // 오늘부터 3일 후까지 4일간의 데이터 추출 (중기예보는 4일 후부터 시작)
+  // 오늘부터 3일 후까지 4일간의 데이터 추출 (중기예보는 5일 후부터 시작)
   for (let dayOffset = 0; dayOffset < 4; dayOffset++) {
     const targetDate = new Date(today);
     targetDate.setDate(targetDate.getDate() + dayOffset);
