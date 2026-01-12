@@ -171,7 +171,7 @@ export const SearchBar = () => {
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
         <Input
           type="text"
-          placeholder="날씨가 궁금한 지역을 검색해주세요 예) 서울특별시, 마포구, 동교동"
+          placeholder="날씨가 궁금한 지역을 검색해주세요"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
           onKeyDown={handleKeyDown}
