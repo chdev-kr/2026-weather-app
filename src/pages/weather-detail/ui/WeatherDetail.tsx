@@ -167,44 +167,43 @@ export const WeatherDetail = () => {
 
       <main className="flex-1 p-3 sm:p-4 lg:p-6">
         <div className="max-w-6xl mx-auto space-y-6">
-          {/* 로딩 상태 */}
-          {isLoading && (
-            <div className="p-8 text-center text-muted-foreground">
-              날씨 정보를 불러오는 중...
-            </div>
-          )}
-
           {/* 현재 날씨 히어로 */}
-          {!isLoading && currentWeather && (
-            <CurrentWeatherHero
-              location={locationInfo.address}
-              temperature={currentWeather.tmp}
-              tempMin={minMaxTemp.min}
-              tempMax={minMaxTemp.max}
-              sky={currentWeather.sky}
-              pty={currentWeather.pty}
-              pop={currentWeather.pop}
-              latitude={locationInfo.latitude}
-              longitude={locationInfo.longitude}
-              onRefreshLocation={handleRefreshLocation}
+          <CurrentWeatherHero
+            location={locationInfo.address}
+            temperature={currentWeather?.tmp || ""}
+            tempMin={minMaxTemp.min}
+            tempMax={minMaxTemp.max}
+            sky={currentWeather?.sky || "1"}
+            pty={currentWeather?.pty || "0"}
+            pop={currentWeather?.pop || "0"}
+            latitude={locationInfo.latitude}
+            longitude={locationInfo.longitude}
+            onRefreshLocation={handleRefreshLocation}
+            isLoading={isLoading}
+          />
+
+          {/* 시간별 예보 */}
+          {(isLoading || hourlyData.length > 0) && (
+            <HourlyForecast
+              hourlyData={hourlyData}
+              isLoading={isLoading}
             />
           )}
 
-          {/* 시간별 예보 */}
-          {!isLoading && hourlyData.length > 0 && (
-            <HourlyForecast hourlyData={hourlyData} />
-          )}
-
           {/* 주간 예보 */}
-          {!isLoading && weeklyData.length > 0 && (
-            <WeeklyForecast weeklyData={weeklyData} />
+          {(isLoading || weeklyData.length > 0) && (
+            <WeeklyForecast
+              weeklyData={weeklyData}
+              isLoading={isLoading}
+            />
           )}
 
           {/* 상세 정보 */}
-          {!isLoading && currentWeather && (
+          {(isLoading || currentWeather) && (
             <WeatherDetails
-              humidity={currentWeather.reh}
-              windSpeed={currentWeather.wsd}
+              humidity={currentWeather?.reh || "0"}
+              windSpeed={currentWeather?.wsd || "0"}
+              isLoading={isLoading}
             />
           )}
         </div>

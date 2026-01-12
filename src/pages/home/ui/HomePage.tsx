@@ -343,39 +343,39 @@ export const HomePage = () => {
             </div>
           )}
 
-          {/* 로딩 상태 */}
-          {isLoading && !geoError && (
-            <div className="p-8 text-center text-muted-foreground">
-              날씨 정보를 불러오는 중...
-            </div>
-          )}
-
           {/* 현재 날씨 히어로 섹션 */}
-          {!isLoading && currentWeather && currentLocation && (
+          {currentLocation && (
             <CurrentWeatherHero
               location={currentLocation.address}
-              temperature={currentWeather.tmp}
+              temperature={currentWeather?.tmp || ""}
               tempMin={minMaxTemp.min}
               tempMax={minMaxTemp.max}
-              sky={currentWeather.sky}
-              pty={currentWeather.pty}
-              pop={currentWeather.pop}
+              sky={currentWeather?.sky || "1"}
+              pty={currentWeather?.pty || "0"}
+              pop={currentWeather?.pop || "0"}
               clickable
               locationId="current"
               latitude={currentLocation.latitude}
               longitude={currentLocation.longitude}
               onRefreshLocation={handleRefreshLocation}
+              isLoading={isLoading}
             />
           )}
 
           {/* 시간별 예보 */}
-          {!isLoading && hourlyData.length > 0 && (
-            <HourlyForecast hourlyData={hourlyData} />
+          {(isLoading || hourlyData.length > 0) && (
+            <HourlyForecast
+              hourlyData={hourlyData}
+              isLoading={isLoading}
+            />
           )}
 
           {/* 주간 예보 */}
-          {!isLoading && weeklyData.length > 0 && (
-            <WeeklyForecast weeklyData={weeklyData} />
+          {(isLoading || weeklyData.length > 0) && (
+            <WeeklyForecast
+              weeklyData={weeklyData}
+              isLoading={isLoading}
+            />
           )}
         </div>
       </main>

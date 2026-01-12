@@ -29,6 +29,7 @@ interface CurrentWeatherHeroProps {
   latitude?: number;
   longitude?: number;
   onRefreshLocation?: () => void;
+  isLoading?: boolean;
 }
 
 export const CurrentWeatherHero = ({
@@ -44,6 +45,7 @@ export const CurrentWeatherHero = ({
   latitude,
   longitude,
   onRefreshLocation,
+  isLoading = false,
 }: CurrentWeatherHeroProps) => {
   const navigate = useNavigate();
   const { addFavorite, removeFavorite, isFavorite, favorites } =
@@ -123,6 +125,61 @@ export const CurrentWeatherHero = ({
   };
 
   const isCurrentlyFavorite = isFavorite(location);
+
+  // 로딩 스켈레톤
+  if (isLoading) {
+    return (
+      <div>
+        <h2 className="text-base sm:text-lg font-bold mb-3 px-1">
+          현재 위치 날씨
+        </h2>
+        <Card className="relative border-2 bg-card animate-pulse">
+          {/* 우측 상단 버튼 스켈레톤 */}
+          <div className="absolute top-3 right-3 z-10 flex gap-1">
+            {onRefreshLocation && (
+              <div className="w-10 h-10 bg-muted rounded" />
+            )}
+            <div className="w-10 h-10 bg-muted rounded" />
+          </div>
+
+          <CardContent className="pt-6 pb-6 px-8 sm:px-12">
+            <div className="flex items-center justify-center gap-10 sm:gap-20">
+              {/* 왼쪽: 날씨 아이콘 스켈레톤 */}
+              <div className="flex flex-col items-center justify-center gap-2 shrink-0">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 bg-muted rounded-full" />
+                <div className="h-4 w-16 bg-muted rounded" />
+              </div>
+
+              {/* 오른쪽: 정보 스켈레톤 */}
+              <div className="space-y-2 sm:space-y-3">
+                {/* 위치 */}
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 sm:w-5 sm:h-5 bg-muted rounded" />
+                  <div className="h-4 w-32 bg-muted rounded" />
+                </div>
+
+                {/* 온도 */}
+                <div className="h-14 sm:h-16 w-32 bg-muted rounded" />
+
+                {/* 최저/최고 온도 */}
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <div className="h-5 w-16 bg-muted rounded" />
+                  <div className="h-5 w-2 bg-muted rounded" />
+                  <div className="h-5 w-16 bg-muted rounded" />
+                </div>
+
+                {/* 강수확률 */}
+                <div className="flex items-center gap-1.5">
+                  <div className="w-4 h-4 bg-muted rounded" />
+                  <div className="h-4 w-24 bg-muted rounded" />
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div>

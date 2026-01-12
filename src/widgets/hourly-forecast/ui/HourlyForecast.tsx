@@ -21,9 +21,10 @@ interface HourlyData {
 
 interface HourlyForecastProps {
   hourlyData: HourlyData[];
+  isLoading?: boolean;
 }
 
-export const HourlyForecast = ({ hourlyData }: HourlyForecastProps) => {
+export const HourlyForecast = ({ hourlyData, isLoading = false }: HourlyForecastProps) => {
   const [currentPage, setCurrentPage] = useState(0);
   const ITEMS_PER_PAGE = 12;
 
@@ -53,6 +54,40 @@ export const HourlyForecast = ({ hourlyData }: HourlyForecastProps) => {
       setCurrentPage(currentPage + 1);
     }
   };
+
+  // 로딩 스켈레톤
+  if (isLoading) {
+    return (
+      <div>
+        <h2 className="text-base sm:text-lg font-semibold mb-3 px-1">
+          시간별 예보
+        </h2>
+        <div className="flex items-center justify-center gap-2">
+          <div className="w-10 shrink-0" />
+
+          <div className="flex gap-2 flex-1 max-w-full">
+            {Array.from({ length: 12 }).map((_, index) => (
+              <Card
+                key={index}
+                className="bg-muted/50 flex-1 min-w-16 animate-pulse"
+              >
+                <CardContent className="p-2">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <div className="h-3 w-10 bg-muted rounded" />
+                    <div className="w-8 h-8 bg-muted rounded-full" />
+                    <div className="h-5 w-8 bg-muted rounded" />
+                    <div className="h-3 w-10 bg-muted rounded" />
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+
+          <div className="w-10 shrink-0" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div>
