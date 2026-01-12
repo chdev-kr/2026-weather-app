@@ -43,15 +43,36 @@ export const WeatherCard = ({
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedLocation, setEditedLocation] = useState(location);
-  const { removeFavorite, favorites } = useFavoritesStore();
+  const { removeFavorite, updateFavoriteName, favorites } = useFavoritesStore();
 
   const handleLocationSave = () => {
+    if (!id) return;
+
+    // 변경사항이 있을 때만 저장
+    if (editedLocation.trim() && editedLocation !== location) {
+      if (typeof id === 'string') {
+        updateFavoriteName(id, editedLocation.trim());
+      } else {
+        const favorite = favorites[id - 1];
+        if (favorite) {
+          updateFavoriteName(favorite.id, editedLocation.trim());
+        }
+      }
+    }
     setIsEditing(false);
   };
 
   const handleLocationCancel = () => {
     setEditedLocation(location);
     setIsEditing(false);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleLocationSave();
+    } else if (e.key === 'Escape') {
+      handleLocationCancel();
+    }
   };
 
   const handleCardClick = () => {
@@ -176,6 +197,7 @@ export const WeatherCard = ({
                   <Input
                     value={editedLocation}
                     onChange={(e) => setEditedLocation(e.target.value)}
+                    onKeyDown={handleKeyDown}
                     className="h-7 text-sm font-semibold"
                     autoFocus
                   />
