@@ -44,6 +44,7 @@ export const getCurrentWeatherData = (items: ShortTermForecastItem[]) => {
 
 /**
  * 특정 날짜의 최저/최고 기온 추출
+ * TMN/TMX가 없는 경우 TMP 값들에서 최저/최고 계산
  */
 export const getMinMaxTemp = (
   items: ShortTermForecastItem[],
@@ -56,9 +57,26 @@ export const getMinMaxTemp = (
     (item) => item.category === 'TMX' && item.fcstDate === targetDate
   );
 
+  // TMN/TMX 값도 정수로 반올림
+  let min = tmnItem?.fcstValue ? String(Math.round(parseFloat(tmnItem.fcstValue))) : '';
+  let max = tmxItem?.fcstValue ? String(Math.round(parseFloat(tmxItem.fcstValue))) : '';
+
+  // TMN/TMX가 없는 경우 TMP 값들에서 최저/최고 계산
+  if (!min || !max) {
+    const tmpItems = items.filter(
+      (item) => item.category === 'TMP' && item.fcstDate === targetDate
+    );
+    const tmpValues = tmpItems.map((item) => parseFloat(item.fcstValue));
+
+    if (tmpValues.length > 0) {
+      if (!min) min = String(Math.round(Math.min(...tmpValues)));
+      if (!max) max = String(Math.round(Math.max(...tmpValues)));
+    }
+  }
+
   return {
-    min: tmnItem?.fcstValue || '',
-    max: tmxItem?.fcstValue || '',
+    min,
+    max,
   };
 };
 
