@@ -1,5 +1,5 @@
 import { WeatherCard } from "@/entities/weather/ui/WeatherCard";
-import { Plus, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 
@@ -26,34 +26,22 @@ export const FavoritesList = ({ favorites }: FavoritesListProps) => {
   return (
     <div>
       {/* 헤더 */}
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <h2 className="text-base sm:text-lg font-semibold">
-            즐겨찾기 ({favorites.length}/6)
-          </h2>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setIsExpanded(!isExpanded)}
-            className="h-7 px-2"
-          >
-            {isExpanded ? (
-              <ChevronUp className="w-4 h-4" />
-            ) : (
-              <ChevronDown className="w-4 h-4" />
-            )}
-          </Button>
-        </div>
-        {favorites.length < 6 && (
-          <Button
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            장소 추가
-          </Button>
-        )}
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-base sm:text-lg font-semibold">
+          즐겨찾기 ({favorites.length}/6)
+        </h2>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setIsExpanded(!isExpanded)}
+          className="h-7 px-2"
+        >
+          {isExpanded ? (
+            <ChevronUp className="w-4 h-4" />
+          ) : (
+            <ChevronDown className="w-4 h-4" />
+          )}
+        </Button>
       </div>
 
       {/* 모바일: 가로 스크롤 / 태블릿+: 그리드 */}
