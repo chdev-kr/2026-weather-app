@@ -53,8 +53,10 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
 
   return (
     <div>
-      <h2 className="text-base sm:text-lg font-semibold mb-3">주간 예보</h2>
-      <Card className="bg-muted/50">
+      <h2 className="text-base sm:text-lg font-semibold mb-3 px-1">
+        주간 예보
+      </h2>
+      <Card className="bg-muted/50 py-0">
         <CardContent className="p-0">
           <div className="divide-y divide-border">
             {weeklyData.map((day, index) => {
@@ -64,7 +66,7 @@ export const WeeklyForecast = ({ weeklyData }: WeeklyForecastProps) => {
               return (
                 <div
                   key={index}
-                  className="flex items-center justify-between p-3 sm:p-4 hover:bg-muted/30 transition-colors"
+                  className="flex items-center justify-between p-3 sm:p-4 transition-colors"
                 >
                   {/* 날짜 */}
                   <div className="w-16 sm:w-20">
