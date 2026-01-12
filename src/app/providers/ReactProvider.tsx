@@ -1,6 +1,7 @@
 import { HomePage } from "@/pages/home/ui/HomePage";
 import { NotFoundPage } from "@/pages/not-found/ui/NotFoundPage";
 import { WeatherDetail } from "@/pages/weather-detail/ui/WeatherDetail";
+import { ScrollToTop } from "@/shared/lib/ScrollToTop";
 import {
   createBrowserRouter,
   RouterProvider as Router,
@@ -9,15 +10,30 @@ import {
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <HomePage />,
+    element: (
+      <>
+        <ScrollToTop />
+        <HomePage />
+      </>
+    ),
   },
   {
     path: "/weather/:id",
-    element: <WeatherDetail />,
+    element: (
+      <>
+        <ScrollToTop />
+        <WeatherDetail />
+      </>
+    ),
   },
   {
     path: "*",
-    element: <NotFoundPage />,
+    element: (
+      <>
+        <ScrollToTop />
+        <NotFoundPage />
+      </>
+    ),
   },
 ]);
 
