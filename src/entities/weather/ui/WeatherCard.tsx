@@ -18,7 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 
 interface WeatherCardProps {
-  id?: number; // 위치 ID (선택)
+  id?: number | string; // 위치 ID (선택) - 숫자 또는 UUID 문자열
   location: string; // 지역명
   temperature: string; // 현재 온도
   tempMin?: string; // 최저 온도 (선택)
@@ -63,14 +63,20 @@ export const WeatherCard = ({
   const handleRemoveFavorite = (e: React.MouseEvent) => {
     e.stopPropagation();
 
-    // id로 즐겨찾기 찾기
-    const favorite = favorites.find(
-      (fav) => parseInt(fav.id) === id
-    );
+    if (!id) return;
 
-    if (favorite) {
+    // id가 UUID 문자열이면 그대로 사용
+    if (typeof id === 'string') {
       if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
-        removeFavorite(favorite.id);
+        removeFavorite(id);
+      }
+    } else {
+      // id가 숫자면 favorites에서 찾기
+      const favorite = favorites[id - 1]; // 1부터 시작하므로 -1
+      if (favorite) {
+        if (window.confirm(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`)) {
+          removeFavorite(favorite.id);
+        }
       }
     }
   };

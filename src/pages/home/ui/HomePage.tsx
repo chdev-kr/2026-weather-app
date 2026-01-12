@@ -184,7 +184,7 @@ export const HomePage = () => {
 
         if (current) {
           return {
-            id: parseInt(fav.id) || 0,
+            id: fav.id, // 실제 UUID 전달
             province,
             district,
             temperature: current.tmp,
@@ -199,7 +199,7 @@ export const HomePage = () => {
 
       // 로딩 중이거나 데이터 없을 때 기본값
       return {
-        id: parseInt(fav.id) || 0,
+        id: fav.id, // 실제 UUID 전달
         province,
         district,
         temperature: "-",
@@ -257,6 +257,8 @@ export const HomePage = () => {
               pop={currentWeather.pop}
               clickable
               locationId="current"
+              latitude={currentLocation.latitude}
+              longitude={currentLocation.longitude}
             />
           )}
 
