@@ -170,10 +170,21 @@ export const HomePage = () => {
     const weatherDataArray = [weather0, weather1, weather2, weather3, weather4, weather5];
 
     return favorites.map((fav, index) => {
-      const parts = fav.address.split(' ');
-      // province: 구/군 (parts[1]), district: 동/읍/면 (parts[2])
-      const province = parts[1] || parts[0] || '';
-      const district = parts[2] || parts[1] || '';
+      // 사용자가 수정한 이름(name)이 원래 주소(address)와 다르면 사용자 지정 이름 사용
+      // 같으면 주소를 파싱해서 표시
+      let province = '';
+      let district = '';
+
+      if (fav.name !== fav.address) {
+        // 사용자가 지정한 별칭 사용 (예: "우리집")
+        province = fav.name;
+        district = '';
+      } else {
+        // 주소를 파싱해서 "구 동" 형식으로 표시
+        const parts = fav.address.split(' ');
+        province = parts[1] || parts[0] || '';
+        district = parts[2] || parts[1] || '';
+      }
 
       // 해당 즐겨찾기의 날씨 데이터
       const weatherData = weatherDataArray[index];
