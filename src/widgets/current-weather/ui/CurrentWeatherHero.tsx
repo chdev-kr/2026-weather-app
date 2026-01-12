@@ -73,19 +73,36 @@ export const CurrentWeatherHero = ({
       // 즐겨찾기에서 삭제
       const favorite = favorites.find((fav) => fav.address === location);
       if (favorite) {
-        toast(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`, {
+        const toastId = toast(`${location}을(를) 즐겨찾기에서 삭제하시겠습니까?`, {
           action: {
             label: "삭제",
             onClick: () => {
               removeFavorite(favorite.id);
               toast.success("삭제가 완료되었습니다.");
+              document.removeEventListener("keydown", handleKeyPress);
             },
           },
           cancel: {
             label: "취소",
-            onClick: () => {},
+            onClick: () => {
+              document.removeEventListener("keydown", handleKeyPress);
+            },
           },
         });
+
+        // 엔터 키 이벤트 핸들러
+        const handleKeyPress = (e: KeyboardEvent) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            removeFavorite(favorite.id);
+            toast.success("삭제가 완료되었습니다.");
+            toast.dismiss(toastId);
+            document.removeEventListener("keydown", handleKeyPress);
+          }
+        };
+
+        // 엔터 키 이벤트 리스너 등록
+        document.addEventListener("keydown", handleKeyPress);
       }
     } else {
       // 즐겨찾기에 추가
