@@ -1,9 +1,9 @@
 import type { ShortTermForecastItem } from '../api/weather/types';
 
 /**
- * 기상청 API 응답에서 특정 카테고리 값을 추출하는 함수
+ * 기상청 API 응답에서 특정 카테고리 값을 추출하는 함수 (내부 사용)
  */
-export const getValueByCategory = (
+const getValueByCategory = (
   items: ShortTermForecastItem[],
   category: string,
   fcstDate: string,
@@ -120,47 +120,6 @@ export const getHourlyForecast = (
   });
 };
 
-/**
- * 하늘 상태 코드를 문자열로 변환
- * 1: 맑음, 3: 구름많음, 4: 흐림
- */
-export const getSkyCondition = (skyCode: string): string => {
-  switch (skyCode) {
-    case '1':
-      return '맑음';
-    case '3':
-      return '구름많음';
-    case '4':
-      return '흐림';
-    default:
-      return '';
-  }
-};
-
-/**
- * 강수 형태 코드를 문자열로 변환
- * 0: 없음, 1: 비, 2: 비/눈, 3: 눈, 5: 빗방울, 6: 빗방울눈날림, 7: 눈날림
- */
-export const getPrecipitationType = (ptyCode: string): string => {
-  switch (ptyCode) {
-    case '0':
-      return '없음';
-    case '1':
-      return '비';
-    case '2':
-      return '비/눈';
-    case '3':
-      return '눈';
-    case '5':
-      return '빗방울';
-    case '6':
-      return '빗방울눈날림';
-    case '7':
-      return '눈날림';
-    default:
-      return '';
-  }
-};
 
 /**
  * 단기예보에서 일별 데이터 추출 (오늘부터 3일 후까지)

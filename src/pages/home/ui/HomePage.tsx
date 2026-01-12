@@ -7,28 +7,14 @@ import { FavoritesList } from "@/widgets/favorites-list/ui/FavoritesList";
 import { Header } from "@/widgets/header/ui/Header";
 import { Footer } from "@/widgets/footer/ui/Footer";
 import { useGeolocation } from "@/shared/hooks/useGeolocation";
-import {
-  useShortTermForecast,
-  useMidTermLandForecast,
-  useMidTermTemperatureForecast,
-} from "@/shared/api/weather/hooks";
+import { useWeatherData } from "@/shared/hooks/useWeatherData";
+import { useShortTermForecast } from "@/shared/api/weather/hooks";
 import { useLocationStore } from "@/shared/store/useLocationStore";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 import { convertGpsToGrid } from "@/shared/lib/coordinate-converter";
 import { coord2RegionCode } from "@/shared/lib/nominatim-geocoder";
-import {
-  getCurrentWeatherData,
-  getMinMaxTemp,
-  getHourlyForecast,
-  getWeatherApiDateTime,
-  getDailyForecastFromShortTerm,
-} from "@/shared/lib/weather-parser";
-import {
-  getMidTermWeeklyForecast,
-  getMidTermForecastTime,
-  getLandForecastRegionCode,
-  getTemperatureForecastRegionCode,
-} from "@/shared/lib/midterm-parser";
+import { parseAddressToShortForm } from "@/shared/lib/address-parser";
+import { getCurrentWeatherData, getMinMaxTemp } from "@/shared/lib/weather-parser";
 
 export const HomePage = () => {
   const { currentLocation, setCurrentLocation, clearCurrentLocation } =
@@ -64,109 +50,21 @@ export const HomePage = () => {
     }
   }, [latitude, longitude, currentLocation, setCurrentLocation]);
 
-  // 4. GPS 좌표 → 기상청 격자 좌표 변환
-  const gridCoordinate = useMemo(() => {
-    if (!currentLocation) return null;
-    return convertGpsToGrid({
-      latitude: currentLocation.latitude,
-      longitude: currentLocation.longitude,
-    });
-  }, [currentLocation]);
-
-  // 5. 기상청 단기예보 API 호출
-  const { baseDate, baseTime } = getWeatherApiDateTime();
-  const { data: weatherData, isLoading: weatherLoading } = useShortTermForecast(
-    gridCoordinate || { nx: 0, ny: 0 },
+  // 4. 현재 위치 날씨 데이터 가져오기 (커스텀 Hook 사용)
+  const {
+    currentWeather,
+    minMaxTemp,
+    hourlyData,
+    weeklyData,
+    lastUpdateTime,
+    isLoading: weatherLoading,
     baseDate,
     baseTime,
-    !!gridCoordinate
-  );
-
-  // 6. 중기예보 API 호출
-  // 육상예보와 기온예보는 서로 다른 지역코드 체계 사용
-  const landRegId = useMemo(() => {
-    if (!currentLocation) return "";
-    return getLandForecastRegionCode(
-      currentLocation.latitude,
-      currentLocation.longitude
-    );
-  }, [currentLocation]);
-
-  const tempRegId = useMemo(() => {
-    if (!currentLocation) return "";
-    return getTemperatureForecastRegionCode(
-      currentLocation.latitude,
-      currentLocation.longitude
-    );
-  }, [currentLocation]);
-
-  const tmFc = getMidTermForecastTime();
-
-  const { data: midTermLandData } = useMidTermLandForecast(
-    landRegId,
-    tmFc,
-    !!landRegId
-  );
-  const { data: midTermTempData } = useMidTermTemperatureForecast(
-    tempRegId,
-    tmFc,
-    !!tempRegId
-  );
-
-  // 7. 날씨 데이터 파싱
-  const currentWeather = useMemo(() => {
-    if (!weatherData?.response?.body?.items?.item) return null;
-    const items = weatherData.response.body.items.item;
-    return getCurrentWeatherData(items);
-  }, [weatherData]);
-
-  const minMaxTemp = useMemo(() => {
-    if (!weatherData?.response?.body?.items?.item) return { min: "", max: "" };
-    const items = weatherData.response.body.items.item;
-    return getMinMaxTemp(items, baseDate);
-  }, [weatherData, baseDate]);
-
-  const hourlyData = useMemo(() => {
-    if (!weatherData?.response?.body?.items?.item) return [];
-    const items = weatherData.response.body.items.item;
-    return getHourlyForecast(items, baseDate, 24);
-  }, [weatherData, baseDate]);
-
-  // 8. 단기예보에서 일별 데이터 추출 (오늘부터 3일 후까지 4일)
-  const shortTermDailyData = useMemo(() => {
-    if (!weatherData?.response?.body?.items?.item) return [];
-    const items = weatherData.response.body.items.item;
-    return getDailyForecastFromShortTerm(items);
-  }, [weatherData]);
-
-  // 9. 중기예보 데이터 파싱 (4일 후부터 10일 후까지 7일)
-  const midTermWeeklyData = useMemo(() => {
-    const landItem = midTermLandData?.response?.body?.items?.item?.[0];
-    const tempItem = midTermTempData?.response?.body?.items?.item?.[0];
-
-    return getMidTermWeeklyForecast(
-      landItem || null,
-      tempItem || null,
-      baseDate
-    );
-  }, [midTermLandData, midTermTempData, baseDate]);
-
-  // 10. 단기예보 4일 + 중기예보 7일 = 총 11일 통합
-  const weeklyData = useMemo(() => {
-    return [...shortTermDailyData, ...midTermWeeklyData];
-  }, [shortTermDailyData, midTermWeeklyData]);
-
-  // 11. 마지막 업데이트 시간 (baseDate + baseTime 형식으로)
-  const lastUpdateTime = useMemo(() => {
-    if (!baseDate || !baseTime) return "";
-    // YYYYMMDD + HHMM -> YYYY-MM-DD HH:MM 형식으로 변환
-    const year = baseDate.slice(0, 4);
-    const month = baseDate.slice(4, 6);
-    const day = baseDate.slice(6, 8);
-    const hour = baseTime.slice(0, 2);
-    const minute = baseTime.slice(2, 4);
-    return `${year}-${month}-${day} ${hour}:${minute}`;
-  }, [baseDate, baseTime]);
+  } = useWeatherData({
+    latitude: currentLocation?.latitude || null,
+    longitude: currentLocation?.longitude || null,
+    enabled: !!currentLocation,
+  });
 
   // 즐겨찾기 목록 - 최대 6개 고정 배열로 날씨 데이터 조회
   const fav0 = favorites[0];
@@ -255,9 +153,10 @@ export const HomePage = () => {
         district = "";
       } else {
         // 주소를 파싱해서 "구 동" 형식으로 표시
-        const parts = fav.address.split(" ");
-        province = parts[1] || parts[0] || "";
-        district = parts[2] || parts[1] || "";
+        const parsed = parseAddressToShortForm(fav.address);
+        const parts = parsed.split(" ");
+        province = parts[0] || "";
+        district = parts[1] || "";
       }
 
       // 해당 즐겨찾기의 날씨 데이터
