@@ -250,7 +250,7 @@ import { Button } from "@/components/ui/button";
 - `korea_districts.json` 동적 import로 지연 로딩
 - 검색 기능 사용 시에만 데이터 다운로드
 - 배열 `filter()` 메소드로 검색 구현
-- 최대 15개 결과만 표시하여 렌더링 성능 최적화
+
 
 **데이터 출처 및 구조:**
 
