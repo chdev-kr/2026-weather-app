@@ -1,6 +1,6 @@
 # 웨더온
 
-![OG Image](./weather-app/public/img/OG.jpg)
+![OG Image](./public/img/OG.jpg)
 
 기상청 공공데이터 API를 활용한 실시간 날씨 정보 제공 웹입니다.
 
@@ -15,7 +15,7 @@
 - 현재 기온, 최저/최고 기온, 하늘 상태, 강수 확률 표시
 - 위치 새로고침 버튼으로 수동 업데이트 가능
 
-<img src="./weather-app/public/img/demo/location.gif" width="100%" alt="현재 위치 날씨">
+<img src="./public/img/demo/location.gif" width="100%" alt="현재 위치 날씨">
 
 ### 시간별 & 주간 날씨 예보
 
@@ -23,7 +23,7 @@
 - 10일 주간 예보 (단기예보 + 중기예보 결합)
 - 오전/오후 날씨 구분, 최저/최고 기온, 강수 확률
 
-<img src="./weather-app/public/img/demo/hourlyandweekly.gif" width="100%" alt="시간별 및 주간 예보">
+<img src="./public/img/demo/hourlyandweekly.gif" width="100%" alt="시간별 및 주간 예보">
 
 ### 지역 검색 & 즐겨찾기
 
@@ -33,7 +33,7 @@
 - 즐겨찾기 섹션 접기/펼치기 가능
 - 동적 import로 초기 로딩 속도 최적화 (98.3% 감소)
 
-<img src="./weather-app/public/img/demo/searchandfavorites.gif" width="100%" alt="지역 검색 및 즐겨찾기">
+<img src="./public/img/demo/searchandfavorites.gif" width="100%" alt="지역 검색 및 즐겨찾기">
 
 ### URL 공유 & 상세 페이지
 
@@ -41,11 +41,11 @@
 - `/weather/:id` 형태의 동적 라우팅
 - 공유 버튼으로 클립보드 복사
 
-<img src="./weather-app/public/img/demo/sharing.gif" width="100%" alt="URL 공유">
+<img src="./public/img/demo/sharing.gif" width="100%" alt="URL 공유">
 
-<img src="./weather-app/public/img/demo/detailpage.gif" width="100%" alt="상세 페이지">
+<img src="./public/img/demo/detailpage.gif" width="100%" alt="상세 페이지">
 
-<img src="./weather-app/public/img/demo/sharinglink.png" width="50%" alt="og 태그">
+<img src="./public/img/demo/sharinglink.png" width="50%" alt="og 태그">
 
 ### 다크 모드 지원
 
@@ -53,7 +53,7 @@
 - Zustand persist로 테마 설정 저장
 - 부드러운 테마 전환
 
-<img src="./weather-app/public/img/demo/darkmode.gif" width="100%" alt="다크 모드">
+<img src="./public/img/demo/darkmode.gif" width="100%" alt="다크 모드">
 
 ## 기술 스택
 
