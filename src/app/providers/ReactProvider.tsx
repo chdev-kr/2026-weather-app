@@ -1,11 +1,33 @@
-import { HomePage } from "@/pages/home/ui/HomePage";
-import { NotFoundPage } from "@/pages/not-found/ui/NotFoundPage";
-import { WeatherDetail } from "@/pages/weather-detail/ui/WeatherDetail";
+import { lazy, Suspense } from "react";
 import { ScrollToTop } from "@/shared/lib/ScrollToTop";
 import {
   createBrowserRouter,
   RouterProvider as Router,
 } from "react-router-dom";
+
+// Lazy load pages
+const HomePage = lazy(() =>
+  import("@/pages/home/ui/HomePage").then((module) => ({
+    default: module.HomePage,
+  }))
+);
+const WeatherDetail = lazy(() =>
+  import("@/pages/weather-detail/ui/WeatherDetail").then((module) => ({
+    default: module.WeatherDetail,
+  }))
+);
+const NotFoundPage = lazy(() =>
+  import("@/pages/not-found/ui/NotFoundPage").then((module) => ({
+    default: module.NotFoundPage,
+  }))
+);
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="text-muted-foreground">Loading...</div>
+  </div>
+);
 
 const router = createBrowserRouter([
   {
@@ -13,7 +35,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <ScrollToTop />
-        <HomePage />
+        <Suspense fallback={<PageLoader />}>
+          <HomePage />
+        </Suspense>
       </>
     ),
   },
@@ -22,7 +46,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <ScrollToTop />
-        <WeatherDetail />
+        <Suspense fallback={<PageLoader />}>
+          <WeatherDetail />
+        </Suspense>
       </>
     ),
   },
@@ -31,7 +57,9 @@ const router = createBrowserRouter([
     element: (
       <>
         <ScrollToTop />
-        <NotFoundPage />
+        <Suspense fallback={<PageLoader />}>
+          <NotFoundPage />
+        </Suspense>
       </>
     ),
   },

@@ -3,24 +3,40 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useState, useMemo, useRef, useEffect } from "react";
-import koreaDistricts from "@/shared/data/korea_districts.json";
 import { address2Coord } from "@/shared/lib/nominatim-geocoder";
 import { useLocationStore } from "@/shared/store/useLocationStore";
 import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 import { toast } from "sonner";
 
+let koreaDistricts: string[] | null = null;
+
+// 동적으로 korea_districts.json 로드
+const loadDistricts = async () => {
+  if (koreaDistricts === null) {
+    const module = await import("@/shared/data/korea_districts.json");
+    koreaDistricts = module.default;
+  }
+  return koreaDistricts;
+};
+
 export const SearchBar = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [districts, setDistricts] = useState<string[]>([]);
   const { setCurrentLocation } = useLocationStore();
   const { addFavorite, isFavorite } = useFavoritesStore();
   const searchRef = useRef<HTMLDivElement>(null);
   const selectedItemRef = useRef<HTMLDivElement>(null);
 
+  // 컴포넌트 마운트 시 districts 로드
+  useEffect(() => {
+    loadDistricts().then((data) => setDistricts(data || []));
+  }, []);
+
   // korea_districts.json에서 검색어에 맞는 주소 필터링
   const searchResults = useMemo(() => {
-    if (!searchTerm || searchTerm.trim().length === 0) {
+    if (!searchTerm || searchTerm.trim().length === 0 || districts.length === 0) {
       return [];
     }
 
@@ -29,7 +45,7 @@ export const SearchBar = () => {
     const queryWithHyphen = query.replace(/\s+/g, "-");
 
     // 검색어와 일치하는 주소를 찾기
-    const results = koreaDistricts
+    const results = districts
       .filter((district: string) => {
         // 원본 검색어와 하이픈 변환 검색어 둘 다 검색
         return district.includes(query) || district.includes(queryWithHyphen);
@@ -37,7 +53,7 @@ export const SearchBar = () => {
       .slice(0, 15); // 최대 15개 표시
 
     return results;
-  }, [searchTerm]);
+  }, [searchTerm, districts]);
 
   // 검색 결과가 바뀌면 선택 인덱스 초기화
   useEffect(() => {

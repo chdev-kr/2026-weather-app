@@ -14,7 +14,10 @@ import { useFavoritesStore } from "@/shared/store/useFavoritesStore";
 import { convertGpsToGrid } from "@/shared/lib/coordinate-converter";
 import { coord2RegionCode } from "@/shared/lib/nominatim-geocoder";
 import { parseAddressToShortForm } from "@/shared/lib/address-parser";
-import { getCurrentWeatherData, getMinMaxTemp } from "@/shared/lib/weather-parser";
+import {
+  getCurrentWeatherData,
+  getMinMaxTemp,
+} from "@/shared/lib/weather-parser";
 
 export const HomePage = () => {
   const { currentLocation, setCurrentLocation, clearCurrentLocation } =
@@ -223,7 +226,7 @@ export const HomePage = () => {
   // 메타 태그 업데이트 (메인)
   useEffect(() => {
     // 기본 제목
-    const title = "웨더온 - 오늘의 날씨는?";
+    const title = "웨더온";
     document.title = title;
 
     // 메타 description
@@ -266,7 +269,10 @@ export const HomePage = () => {
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: title },
       { name: "twitter:description", content: description },
-      { name: "twitter:image", content: `${window.location.origin}/img/OG.jpg` },
+      {
+        name: "twitter:image",
+        content: `${window.location.origin}/img/OG.jpg`,
+      },
     ];
 
     twitterTags.forEach(({ name, content }) => {

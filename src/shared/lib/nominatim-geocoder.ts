@@ -138,7 +138,7 @@ export const address2Coord = async (
  * 좌표를 행정구역 코드로 변환
  * @param longitude 경도
  * @param latitude 위도
- * @returns Promise<string | null> - "시/군/구 읍/면/동" 형식
+ * @returns Promise<string | null> - "시/도 시/군/구 읍/면/동" 형식
  */
 export const coord2RegionCode = async (
   longitude: number,
@@ -150,10 +150,8 @@ export const coord2RegionCode = async (
     return null;
   }
 
-  // region2 (시/군/구) + region3 (읍/면/동) 형식으로 반환
-  const displayAddress = address.region3
-    ? `${address.region2} ${address.region3}`
-    : address.region2;
-
-  return displayAddress || null;
+  // region1 (시/도) + region2 (시/군/구) + region3 (읍/면/동) 형식으로 반환
+  // 즐겨찾기에 저장할 때 전체 주소가 필요하므로 시/도 포함
+  const parts = [address.region1, address.region2, address.region3].filter(Boolean);
+  return parts.join(" ") || null;
 };

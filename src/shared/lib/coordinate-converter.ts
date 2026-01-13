@@ -19,7 +19,6 @@ export const convertGpsToGrid = (
   coordinate: GpsCoordinate
 ): GridCoordinate => {
   const DEGRAD = Math.PI / 180.0;
-  const RADDEG = 180.0 / Math.PI;
 
   const re = RE / GRID;
   const slat1 = SLAT1 * DEGRAD;

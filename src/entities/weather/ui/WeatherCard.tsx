@@ -159,16 +159,6 @@ export const WeatherCard = ({
     }
   };
 
-  // 날씨 아이콘 선택 함수
-  const getWeatherIcon = () => {
-    if (pty !== "0") {
-      if (pty === "1") return <CloudRain className="w-12 h-12" />;
-      if (pty === "3") return <CloudSnow className="w-12 h-12" />;
-      return <CloudRain className="w-12 h-12" />;
-    }
-    if (sky === "1") return <Sun className="w-12 h-12" />;
-    return <Cloud className="w-12 h-12" />;
-  };
 
   // 날씨 텍스트 함수
   const getWeatherText = () => {
