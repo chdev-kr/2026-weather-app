@@ -63,13 +63,13 @@ export const HourlyForecast = ({ hourlyData, isLoading = false }: HourlyForecast
           시간별 예보
         </h2>
         <div className="flex items-center justify-center gap-2">
-          <div className="w-10 shrink-0" />
+          <div className="hidden sm:block w-10 shrink-0" />
 
-          <div className="flex gap-2 flex-1 max-w-full">
+          <div className="flex gap-2 flex-1 max-w-full overflow-x-auto snap-x snap-mandatory touch-pan-x">
             {Array.from({ length: 12 }).map((_, index) => (
               <Card
                 key={index}
-                className="bg-muted/50 flex-1 min-w-16 animate-pulse"
+                className="bg-muted/50 flex-1 min-w-16 animate-pulse snap-start"
               >
                 <CardContent className="p-2">
                   <div className="flex flex-col items-center gap-1.5">
@@ -83,7 +83,7 @@ export const HourlyForecast = ({ hourlyData, isLoading = false }: HourlyForecast
             ))}
           </div>
 
-          <div className="w-10 shrink-0" />
+          <div className="hidden sm:block w-10 shrink-0" />
         </div>
       </div>
     );
@@ -100,21 +100,21 @@ export const HourlyForecast = ({ hourlyData, isLoading = false }: HourlyForecast
           <Button
             variant="ghost"
             size="icon"
-            className="shrink-0 bg-background/80 hover:bg-background/90 border-2 rounded-full cursor-pointer"
+            className="hidden sm:inline-flex shrink-0 bg-background/80 hover:bg-background/90 border-2 rounded-full cursor-pointer"
             onClick={handlePrevPage}
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
         ) : (
-          <div className="w-10 shrink-0" />
+          <div className="hidden sm:block w-10 shrink-0" />
         )}
 
         {/* 카드 영역 */}
-        <div className="flex gap-2 flex-1 max-w-full">
+        <div className="flex gap-2 flex-1 max-w-full overflow-x-auto snap-x snap-mandatory touch-pan-x">
           {currentData.map((hour, index) => (
             <Card
               key={startIndex + index}
-              className="bg-muted/50 flex-1 min-w-16"
+              className="bg-muted/50 flex-1 min-w-16 snap-start"
             >
               <CardContent className="p-2">
                 <div className="flex flex-col items-center gap-1.5">
@@ -138,13 +138,13 @@ export const HourlyForecast = ({ hourlyData, isLoading = false }: HourlyForecast
           <Button
             variant="ghost"
             size="icon"
-            className="shrink-0 bg-background/80 hover:bg-background/90 border-2 rounded-full cursor-pointer"
+            className="hidden sm:inline-flex shrink-0 bg-background/80 hover:bg-background/90 border-2 rounded-full cursor-pointer"
             onClick={handleNextPage}
           >
             <ChevronRight className="w-5 h-5" />
           </Button>
         ) : (
-          <div className="w-10 shrink-0" />
+          <div className="hidden sm:block w-10 shrink-0" />
         )}
       </div>
     </div>
